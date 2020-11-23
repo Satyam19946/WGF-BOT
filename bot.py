@@ -1,19 +1,23 @@
 import discord
 from discord.ext import commands
 
-client = commands.Bot(command_prefix = '!wgfbot ')
+bot = commands.Bot(command_prefix = 'wgf!')
+cogs = ["cogs.helloFromCogs", "cogs.rolesAssigner"]
 
-@client.event
+token = open("passwords/botToken.txt",'r').read()
+
+@bot.event
 async def on_ready():
     print("Bot up and running!!")
+    for cog in cogs:
+        try:
+            bot.load_extension(cog)
+        except Exception as e:
+            print(e)
 
-@client.command()
-async def working(ctx):
-    await ctx.send("Yes, I am working! Current Latency = {:.2f}ms".format(client.latency*1000))
-
-@client.command()
-async def welcome(ctx):
-    await ctx.send("Hello from the other side.")
+@bot.command()
+async def ping(ctx):
+    await ctx.send("Yes, I am working! Current Latency = {:.2f}ms".format(bot.latency*1000))
 
 
-client.run('Nzc5NzA4MTgyNDg1NjYzNzY0.X7kd1A._uD246D4Uq7z1OfA7xWE_WIExRs')
+bot.run(token)
