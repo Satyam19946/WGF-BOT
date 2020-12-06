@@ -4,10 +4,10 @@ from discord.ext import commands
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-# The config files can be found in the logistics folder of the WGF 2021.
+# The config files can be found in the botftuff folder in logistics folder of the WGF 2021.
 gc = gspread.service_account(filename="config/credentials.json")
 attendanceSheetKey = open("config/attendanceSheetKey.txt",'r').read()
-raffleSheetKey = open("config/raffleSheetKey.txt", "r").read()
+# raffleSheetKey = open("config/raffleSheetKey.txt", "r").read()
 
 attendanceSheet = gc.open_by_key(attendanceSheetKey).sheet1
 # raffleSheet = gc.open_by_key(raffleSheetKey).sheet1
