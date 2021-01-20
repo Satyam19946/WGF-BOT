@@ -1,11 +1,17 @@
 from discord.ext import commands
-
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-
+import json
 gc = gspread.service_account(filename="config/credentials.json")
 
-attendanceSheet = gc.open_by_key("1fLjLH3Eiw4xb-Rei0YChxJrggPhdM2cGKxdIoKt3_Nc")
+f = open('config/googleSheets.json')
+data = json.load(f)
+
+
+generalAttendanceSheet = gc.open_by_key(data['generalAttendanceSheet'])
+# artistAlleySheet = gc.open_by_key(data['artistAlleySheet'])
+# raffleTicketSheet = gc.open_by_key(data['raffleTicketSheet'])
+# panelEventSheet = gc.open_by_key(data['panelEventSheet'])
 userNameQuestion = 'Leave Your Discord Username to access personalized features of our Bot!!'
 raffleNumber = 'Raffle Number'
 
@@ -38,7 +44,7 @@ class checkNumber(commands.Cog):
                 counter += 1
             await ctx.send(returnMessage)
         else:
-            await ctx.send("Hello, {} Your Number is something".format(userName))
+            await ctx.send("Hello, {} I couldn't find any Raffle Tickets under your name. Contact aanyone with Tech Comm Role if you think that's wrong.".format(userName))
 
     
 def setup(bot):
