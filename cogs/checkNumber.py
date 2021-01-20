@@ -1,16 +1,26 @@
 import numpy as np
 from discord.ext import commands
-
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-# The config files can be found in the botftuff folder in logistics folder of the WGF 2021.
+import json
 gc = gspread.service_account(filename="config/credentials.json")
 attendanceSheetKey = open("config/attendanceSheetKey.txt",'r').read()
 # raffleSheetKey = open("config/raffleSheetKey.txt", "r").read()
 
-attendanceSheet = gc.open_by_key(attendanceSheetKey).sheet1
-# raffleSheet = gc.open_by_key(raffleSheetKey).sheet1
+
+f = open('config/googleSheets.json')
+data = json.load(f)
+
+
+generalAttendanceSheet = gc.open_by_key(data['generalAttendanceSheet'])
+# artistAlleySheet = gc.open_by_key(data['artistAlleySheet'])
+# raffleTicketSheet = gc.open_by_key(data['raffleTicketSheet'])
+# panelEventSheet = gc.open_by_key(data['panelEventSheet'])
+userNameQuestion = 'Leave Your Discord Username to access personalized features of our Bot!!'
+raffleNumber = 'Raffle Number'
+
+myData = attendanceSheet.sheet1.get_all_records()
 
 #This will update the Raffle Numbers so every user has a raffle number.
 def updateRaffleNumbers():
@@ -53,7 +63,7 @@ class checkNumber(commands.Cog):
                 counter += 1
             await ctx.send(returnMessage)
         else:
-            await ctx.send("Hello, {}, We didn't find any tickets under your username. \n Contact a person with a Tech Comm role if you signed up with your discord username correctly.".format(userName))
+            await ctx.send("Hello, {} I couldn't find any Raffle Tickets under your name. Contact aanyone with Tech Comm Role if you think that's wrong.".format(userName))
 
     
 def setup(bot):
