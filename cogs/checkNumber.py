@@ -1,8 +1,13 @@
+import numpy as np
 from discord.ext import commands
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+
 import json
 gc = gspread.service_account(filename="config/credentials.json")
+attendanceSheetKey = open("config/attendanceSheetKey.txt",'r').read()
+# raffleSheetKey = open("config/raffleSheetKey.txt", "r").read()
+
 
 f = open('config/googleSheets.json')
 data = json.load(f)
@@ -19,7 +24,20 @@ myData = attendanceSheet.sheet1.get_all_records()
 
 #This will update the Raffle Numbers so every user has a raffle number.
 def updateRaffleNumbers():
-    pass
+    myData = np.array(attendanceSheet.get_all_values())
+    print(myData)
+    start = int(myData[1][-2])
+    for i in range(2,len(myData)):
+        print(myData[i][-2])
+        if str(myData[i][-2]) == "" or int(myData[i][-2]) != start+i-1:
+            if i == 1:
+                myData[i][-2] = '10000'
+            else:
+                myData[i][-2] = str(int(myData[i-1][-2]) + 1)
+            myData[i][-1] = 0
+    attendanceSheet.update("K2:L" + str(len(myData)), myData[1:,-2:].tolist())
+    # raffleSheet.update(myData.tolist())
+    return myData
 
 class checkNumber(commands.Cog):
     
@@ -28,12 +46,13 @@ class checkNumber(commands.Cog):
 
     @commands.command()
     async def checkNumber(self, ctx):
-        updateRaffleNumbers()
+        myData = updateRaffleNumbers()
         ticketsFound = []
         userName = ctx.author
-        for data in myData:
-            if data[userNameQuestion] == str(userName):
-                ticketsFound.append(data[raffleNumber])
+        print(myData)
+        for i in range(1,len(myData)):
+            if myData[i][3] == str(userName):
+                ticketsFound.append(myData[i][-2])
         
         numberOfTickets = len(ticketsFound)
         if numberOfTickets:
