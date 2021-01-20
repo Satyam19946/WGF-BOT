@@ -3,7 +3,7 @@ from discord.ext import commands
 
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix = 'wgf!', intents=intents)
-# Add "cogs.rolesAssigner" for also doing a role assignment.
+# Using yagpb for role assignment, don't include rolesAssigner in the cogs.
 cogs = ["cogs.helloFromCogs", "cogs.checkNumber"]
 allowedCommands = ['hello', 'checkNumber', 'ping']
 

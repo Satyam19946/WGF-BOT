@@ -5,39 +5,38 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 import json
 gc = gspread.service_account(filename="config/credentials.json")
-attendanceSheetKey = open("config/attendanceSheetKey.txt",'r').read()
-# raffleSheetKey = open("config/raffleSheetKey.txt", "r").read()
-
-
 f = open('config/googleSheets.json')
 data = json.load(f)
 
 
-generalAttendanceSheet = gc.open_by_key(data['generalAttendanceSheet'])
-# artistAlleySheet = gc.open_by_key(data['artistAlleySheet'])
-# raffleTicketSheet = gc.open_by_key(data['raffleTicketSheet'])
-# panelEventSheet = gc.open_by_key(data['panelEventSheet'])
-userNameQuestion = 'Leave Your Discord Username to access personalized features of our Bot!!'
-raffleNumber = 'Raffle Number'
+generalAttendanceSheet = gc.open_by_key(data['generalAttendanceSheet']).sheet1
+generalAttendanceSheetData = generalAttendanceSheet.get_all_records()
+artistAlleySheet = gc.open_by_key(data['artistAlleySheet']).sheet1
+artistAlleySheetData = artistAlleySheet.get_all_records()
+eventSheet = gc.open_by_key(data['eventSheet']).sheet1
+eventSheetData = eventSheet.get_all_records()
 
-myData = attendanceSheet.sheet1.get_all_records()
+userNameQuestion = 'Leave Your Discord Username with tag (like this xyz#1234) to access personalized Raffle features of WGF Bot.'
+pidQuestion = 'If you are a UCSD Student, please enter your PID. (Leave Blank if Not)'
+raffleNumber = 'Raffle Number'
+firstName = 'First Name'
+
+print(generalAttendanceSheetData)
 
 #This will update the Raffle Numbers so every user has a raffle number.
-def updateRaffleNumbers():
-    myData = np.array(attendanceSheet.get_all_values())
-    print(myData)
-    start = int(myData[1][-2])
-    for i in range(2,len(myData)):
-        print(myData[i][-2])
-        if str(myData[i][-2]) == "" or int(myData[i][-2]) != start+i-1:
-            if i == 1:
-                myData[i][-2] = '10000'
-            else:
-                myData[i][-2] = str(int(myData[i-1][-2]) + 1)
-            myData[i][-1] = 0
-    attendanceSheet.update("K2:L" + str(len(myData)), myData[1:,-2:].tolist())
-    # raffleSheet.update(myData.tolist())
-    return myData
+def getTickets(username):
+    ticketsFound = []
+    for sheets in [generalAttendanceSheetData, artistAlleySheetData, eventSheetData]:
+        if sheets[0][raffleNumber] == '':
+            continue
+        topTicketNumber = int(sheets[0][raffleNumber]) #Use the first entry as the beginning of raffle numbers
+        print(topTicketNumber)
+        for data in sheets:
+            if data[userNameQuestion] == str(username):
+                #Check if ticket has number if not assign it one
+                ticketsFound.append(topTicketNumber)
+            topTicketNumber += 1
+    return ticketsFound
 
 class checkNumber(commands.Cog):
     
@@ -46,14 +45,9 @@ class checkNumber(commands.Cog):
 
     @commands.command()
     async def checkNumber(self, ctx):
-        myData = updateRaffleNumbers()
-        ticketsFound = []
+        ticketsFound = getTickets(ctx.author)
         userName = ctx.author
-        print(myData)
-        for i in range(1,len(myData)):
-            if myData[i][3] == str(userName):
-                ticketsFound.append(myData[i][-2])
-        
+        print(ticketsFound)
         numberOfTickets = len(ticketsFound)
         if numberOfTickets:
             returnMessage = "Hello {}, we found {} ticket(s) under your name: \n".format(userName, numberOfTickets)
