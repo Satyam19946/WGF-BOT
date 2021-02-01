@@ -13,18 +13,22 @@ data = json.load(f)
 userNameQuestion = 'Recommended: Discord Username With Tag (like this: xyz#1234)'
 pidQuestion = 'Please enter your PID'
 firstName = 'First Name'
-startingNumbers = [300000, 400000, 500000]
-sheetsName = ['Attendance', 'Artist Alley', 'Panelists & Events']
+startingNumbers = [300000, 400000, 500000, 600000, 700000]
+sheetsName = ['Attendance', 'Artist Alley', 'David Peterson Panel', 'DVC Event', 'Geoffrey Zatkin Panel']
 
 def getAllTickets():
     generalAttendanceSheet = gc.open_by_key(data['generalAttendanceSheet']).sheet1
     generalAttendanceSheetData = generalAttendanceSheet.get_all_records()
     artistAlleySheet = gc.open_by_key(data['artistAlleySheet']).sheet1
     artistAlleySheetData = artistAlleySheet.get_all_records()
-    eventSheet = gc.open_by_key(data['eventSheet']).sheet1
-    eventSheetData = eventSheet.get_all_records()
+    dpsheet = gc.open_by_key(data['dpsheet']).sheet1
+    dpsheetData = dpsheet.get_all_records()
+    dvceventsheet = gc.open_by_key(data['dvcsheet']).sheet1
+    dvceventData = dvceventsheet.get_all_records()
+    gzeventsheeet = gc.open_by_key(data['gzsheet']).sheet1
+    gzeventData = gzeventsheeet.get_all_records()
     ticketsFound = []
-    for sheets, sheetNumber in zip([generalAttendanceSheetData, artistAlleySheetData, eventSheetData], range(3)):
+    for sheets, sheetNumber in zip([generalAttendanceSheetData, artistAlleySheetData, dpsheetData, dvceventData, gzeventData], range(5)):
         start = startingNumbers[sheetNumber]
         for sheetData in sheets:
             # ticket = (First Name, DiscordTag, TicketNumber)
@@ -37,10 +41,14 @@ def getTickets(username):
     generalAttendanceSheetData = generalAttendanceSheet.get_all_records()
     artistAlleySheet = gc.open_by_key(data['artistAlleySheet']).sheet1
     artistAlleySheetData = artistAlleySheet.get_all_records()
-    eventSheet = gc.open_by_key(data['eventSheet']).sheet1
-    eventSheetData = eventSheet.get_all_records() 
+    dpsheet = gc.open_by_key(data['dpsheet']).sheet1
+    dpsheetData = dpsheet.get_all_records()
+    dvceventsheet = gc.open_by_key(data['dvcsheet']).sheet1
+    dvceventData = dvceventsheet.get_all_records()
+    gzeventsheeet = gc.open_by_key(data['gzsheet']).sheet1
+    gzeventData = gzeventsheeet.get_all_records()
     ticketsFound = [] 
-    for sheets, sheetNumber in zip([generalAttendanceSheetData, artistAlleySheetData, eventSheetData], range(3)): 
+    for sheets, sheetNumber in zip([generalAttendanceSheetData, artistAlleySheetData, dpsheetData, dvceventData, gzeventData], range(5)):
         start = startingNumbers[sheetNumber] 
         for sheetData in sheets: 
             if sheetData[userNameQuestion] == str(username): 
@@ -60,7 +68,7 @@ class checkNumber(commands.Cog):
         name = ticketsFound[winner][0]
         tag = ticketsFound[winner][1]
         ticketnumber = ticketsFound[winner][2]
-        await ctx.send("The winner is {}, Tag: {}, Ticket Number: {}".format(name, tag, ticketnumber))
+        await ctx.send("Picking from a total of {} tickets. \n The winner is {}, Tag: {}, Ticket Number: {}".format(len(ticketsFound), name, tag, ticketnumber))
 
 
     @commands.command()
